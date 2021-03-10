@@ -22,7 +22,7 @@ jobs:
         run: |
           FILE=$(bazel aquery 'outputs(".*zip", //src/main/java/com/etsy/elasticsearch/restlog:restlog_plugin_versioned)' 2>/dev/null|grep -oE 'Outputs: .+' | sed 's/Outputs: \[//' | sed 's/\]//' | tr "," "\n")
           unzip -l $FILE
-          CHECKSUM=$(sha256sum $FILE)
+          CHECKSUM=$(sha256sum $FILE | cut -d " " -f 1 )
           echo "FILE=$FILE" >> $GITHUB_ENV
           echo "CHECKSUM=$CHECKSUM" >> $GITHUB_ENV
       - name: Bazel test
