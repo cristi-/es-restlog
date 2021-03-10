@@ -1,0 +1,35 @@
+name: Release plugin
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version'
+        required: true
+
+jobs:
+  bazel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: mishas/setup-bazelisk-action@v1
+
+      - name: Version
+        run: bazel version
+
+      - name: Bazel build
+        run: bazel build ...
+      - name: List plugin contents
+        run: |
+          FILE=$(bazel aquery 'outputs(".*zip", //src/main/java/com/etsy/elasticsearch/restlog:restlog_plugin_versioned)' 2>/dev/null|grep -oE 'Outputs: .+' | sed 's/Outputs: \[//' | sed 's/\]//' | tr "," "\n")
+          unzip -l $FILE
+      - name: Bazel test
+        run: bazel test ... --test_output=streamed
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          name: Release ${{ github.event.inputs.version }}
+          files: "bazel-out/darwin-fastbuild/bin/src/main/java/com/etsy/elasticsearch/restlog/restlog-plugin-${{ github.event.inputs.version }}.zip"
