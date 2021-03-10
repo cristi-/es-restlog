@@ -21,7 +21,7 @@ jobs:
       - name: List plugin contents
         run: |
           FILE=$(bazel aquery 'outputs(".*zip", //src/main/java/com/etsy/elasticsearch/restlog:restlog_plugin_versioned)' 2>/dev/null|grep -oE 'Outputs: .+' | sed 's/Outputs: \[//' | sed 's/\]//' | tr "," "\n")
-          echo "::set-env name=FILE::$FILE"
+          echo "FILE=$FILE" >> $GITHUB_ENV
           unzip -l $FILE
       - name: Bazel test
         run: bazel test ... --test_output=streamed
