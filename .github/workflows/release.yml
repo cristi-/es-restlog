@@ -24,7 +24,7 @@ jobs:
           unzip -l $FILE
           CHECKSUM=$(sha256sum $FILE)
           echo "FILE=$FILE" >> $GITHUB_ENV
-          echo "CHECKSUM=CHECKSUM" >> $GITHUB_ENV
+          echo "CHECKSUM=$CHECKSUM" >> $GITHUB_ENV
       - name: Bazel test
         run: bazel test ... --test_output=streamed
       - name: Create Release
@@ -37,4 +37,4 @@ jobs:
           name: Release ${{ github.event.inputs.version }}
           body: "sha256sum:  ${{ env.CHECKSUM }}"
           files: "${{ env.FILE }}"
-          fail_on_unmatched_files: true
+          # fail_on_unmatched_files: true
