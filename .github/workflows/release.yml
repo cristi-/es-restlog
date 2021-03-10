@@ -19,7 +19,10 @@ jobs:
       - name: Bazel build
         run: bazel build ...
       - name: List plugin contents
-        run: unzip -l "bazel-out/darwin-fastbuild/bin/src/main/java/com/etsy/elasticsearch/restlog/restlog-plugin-${{ github.event.inputs.version }}.zip"
+        run: |
+          FILE=$(bazel aquery 'outputs(".*zip", //src/main/java/com/etsy/elasticsearch/restlog:restlog_plugin_versioned)' 2>/dev/null|grep -oE 'Outputs: .+' | sed 's/Outputs: \[//' | sed 's/\]//' | tr "," "\n")
+          echo "::set-env name=FILE::$FILE"
+          unzip -l $FILE
       - name: Bazel test
         run: bazel test ... --test_output=streamed
       - name: Create Release
@@ -30,4 +33,4 @@ jobs:
         with:
           tag_name: ${{ github.event.inputs.version }}
           name: Release ${{ github.event.inputs.version }}
-          files: "bazel-out/darwin-fastbuild/bin/src/main/java/com/etsy/elasticsearch/restlog/restlog-plugin-${{ github.event.inputs.version }}.zip"
+          files: "$FILE"
