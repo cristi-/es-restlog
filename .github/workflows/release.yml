@@ -33,4 +33,4 @@ jobs:
         with:
           tag_name: ${{ github.event.inputs.version }}
           name: Release ${{ github.event.inputs.version }}
-          files: "$FILE"
+          files: "${{ env.FILE }}"
